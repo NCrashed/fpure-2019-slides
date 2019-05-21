@@ -8,7 +8,8 @@
 
 		<link rel="stylesheet" href="css/reset.css">
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+		<link rel="stylesheet" href="css/slides.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/monokai.css">
@@ -25,8 +26,96 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+					FRP на фронтенде и reflex-dom в больших проектах <br>
+
+					<img src="/img/logo.png" style="border-width: 0; width: 15%;"/><br>
+
+					<span class="small">Гуща А.В. aka NCrashed</span>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+					## Проекты
+
+					* Туроператор (2015)
+					* Keenetic Speed test system
+					* Cyberleninka Антиплагиат
+					* Собственный PoS блокчейн
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+					## В чём проблема?
+
+					* Команда из хаскеллистов
+					* Хочется ФП и не хочется JS
+					* Минимизация переучивания
+
+					</textarea>
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Альтернативы
+
+						* Elm
+						* Purescript
+						* GHCJS
+
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+						## Elm
+
+						* Сильно ограничен как язык
+						* Нужно дублировать общий код
+						* Композируемость
+
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+						## Purescript
+
+						* Нет STM, отличия в семантике
+						* Нужно дублировать общий код
+						* Медленнее GHCJS
+
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+						## GHCJS
+
+						Плюсы:
+						* Полная реализация GHC (Threads, STM, WeakRef ...)
+						* Переиспользование кода
+						* Минимальные затраты на изучение
+						* Композируемость виджетов (reflex-dom)
+						* Кросскомпиляция на мобилки (reflex-dom)
+
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+						## GHCJS
+
+						Минусы:
+						* Большой выхлоп (20 мб без оптимизации, 500кб оптимизированный)
+						* Перенос вёрстки дизайнеров
+						* Следить за производительностью
+
+						</textarea>
+					</section>
+				</section>
+				<section>Обзор FRP</section>
+				<section>Монадный стек</section>
+				<section>Авторизация</section>
+				<section>Локализация</section>
+				<section>Роутинг</section>
+				<section>Оптимизация</section>
+				<section>Мобильные приложения</section>
 			</div>
 		</div>
 
