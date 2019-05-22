@@ -1,3 +1,7 @@
 .small {
   font-size: 24pt;
 }
+
+img {
+  border-width: 0 !important;
+}

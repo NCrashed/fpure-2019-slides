@@ -31,7 +31,8 @@
 
 					<img src="/img/logo.png" style="border-width: 0; width: 15%;"/><br>
 
-					<span class="small">Гуща А.В. aka NCrashed</span>
+					<span class="small">Гуща А.В. aka NCrashed</span><br>
+					<span class="small">HXR Team</span>
 				</section>
 				<section data-markdown>
 					<textarea data-template>
@@ -109,13 +110,351 @@
 						</textarea>
 					</section>
 				</section>
-				<section>Обзор FRP</section>
-				<section>Монадный стек</section>
-				<section>Авторизация</section>
-				<section>Локализация</section>
-				<section>Роутинг</section>
-				<section>Оптимизация</section>
-				<section>Мобильные приложения</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Обзор FRP
+
+						Ключевые понятия:
+						* Event - дискретный поток значений (push);
+						* Behavior - непрерывный поток значений (pull);
+						* Dynamic - непрерывный поток с нотификацией (push-pull);
+						* Switching - перестройка потоков в runtime.
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Event
+
+						![](img/event_plot.svg)
+
+						``` Haskell
+						type Event a = [(Time, a)]
+						instance Functor Event
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Behavior
+
+						![](img/behavior_plot.svg)
+
+						``` Haskell
+						type Behavior a = Time -> a
+						instance Monad Behavior
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Dynamic
+
+						![](img/dynamic_plot.svg)
+
+						``` Haskell
+						type Dynamic a = (Behavior a, Event a)
+						instance Monad Dynamic
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Switching
+
+						![](img/switching_plot.svg)
+
+						``` Haskell
+						widgetHold :: m a -> Event (m a) -> m (Dynamic a)
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Counter
+
+						<iframe data-src="./demo_counter.html" style="width: 100%"></iframe>
+
+						``` Haskell
+decE :: Event () <- button "-"
+valD :: Dynamic Int <- foldDyn ($) 0 $ leftmost [
+    (\v -> v+1) <$ incE
+  , (\v -> v-1) <$ decE
+  ]
+dynText $ do
+  val <- valD
+  pure $ "Current value: " <> showt val
+incE :: Event () <- button "+"
+						```
+						</textarea>
+					</section>
+
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Монадный стек
+
+						* MTL like tagless final
+						* newtype of ReaderT
+						* Логическое разделение контекстов
+						</textarea>
+					</section>
+
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Авторизация
+
+						``` Haskell
+						type MonadFront m = (
+						    MonadLocalized m
+						  , MonadMaybeAuth m
+						  , MonadErrorPoster m
+						  , MonadMainSocket m)
+						type MonadFrontAuth m = (
+						    MonadFront m
+						  , MonadAuthorized m)
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Авторизация
+
+						``` Haskell
+						class MonadWidget m => MonadMaybeAuth m where
+						  isAuthorized :: m (Dynamic Bool)
+						  getAuthInfoMaybe :: m (Dynamic (Maybe AuthInfo))
+
+						class MonadMaybeAuth m => MonadAuthorized m where
+						  getAuthInfo :: m (Dynamic AuthInfo)
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Авторизация
+
+						``` Haskell
+						liftAuth :: MonadMaybeAuth m => m a -> (forall n . MonadAuthorized n => n a) -> m (Dynamic a)
+						```
+						</textarea>
+					</section>
+
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Локализация
+
+						``` Haskell
+						data Language = Russian | English
+
+						class MonadWidget m => MonadLocalized m where
+						  setLanguage :: Language -> m ()
+						  getLanguage :: m (Dynamic Language)
+
+						class LocalizedPrint a where
+						  localizedShow :: Language -> a -> Text
+						  localizedShowCased :: GrammarCase -> Language -> a -> Text
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Локализация
+
+						``` Haskell
+						instance LocalizedPrint DisputeSide where
+						  localizedShowCased _ English v = case v of
+						    DisputeClaimant -> "claimant"
+						    DisputeDefendant -> "defendant"
+						  localizedShowCased gc Russian v = case v of
+						    DisputeClaimant -> case gc of
+						      Nominative -> "истец"
+						      Accusative -> "истца"
+						      Genitive -> "истца"
+						      Dative -> "истцу"
+						      Instrumental -> "истцом"
+						      Prepositional -> "истце"
+						```
+						</textarea>
+					</section>
+
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Роутинг
+
+						Два различных сценария:
+						* Переход по урле (servant-router)
+						* Навигация внутри виджетов (retractable)
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Servant like
+
+						``` Haskell
+						type FrontendAPI =
+						       "about" :> View
+						  :<|> "restore" :> QueryParam "email" Text :> View
+						  :<|> View
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Servant like
+
+						``` Haskell
+						handler :: RouteT FrontendAPI m (Event URI)
+						handler = aboutPage
+							:<|> (\email -> restorePage email)
+							:<|> (mainPage)
+						```
+						</textarea>
+					</section>
+
+
+					<section data-markdown>
+						<textarea data-template>
+						## Retractable
+
+						``` Haskell
+						type NextRetractable m a = Event (m (Retractable m a))
+
+						data Retractable m a = Retractable {
+						-- | Next widget in chain
+						  retractableNextRoute :: NextRetractable m a
+						-- | Result of execution of retractable widget
+						, retractableResult    :: a
+						-- | Way to return to the widget at the same state
+						, retractableReturn    :: Dynamic (m (Retractable m a))
+						-- | Wich url to setup when the widget is active
+						, retractableUrl       :: Dynamic (Maybe Text)
+						}
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Retractable
+
+						<iframe data-src="./demo_retract.html" style="width: 100%"></iframe>
+
+						``` Haskell
+						frontend :: MonadWidget t m => m ()
+						frontend = retractableStack "/" $ gogo "Go"
+
+						gogo :: MonadWidget m => Text -> m (Retractable m ())
+						gogo str = do
+						  btnE <- button str
+						  pure Retractable {
+						      retractableNextRoute = gogo (str <> " Go") <$ btnE
+						    , retractableResult    = ()
+						    , retractableReturn    = pure $ gogo str
+						    , retractableUrl       = pure Nothing
+						    }
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Retractable
+
+						``` Haskell
+						instance Functor m => Retractable m
+						instance Applicative m => Retractable m
+						instance Monad m => Retractable m
+						```
+						</textarea>
+					</section>
+
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Оптимизация
+
+						* Google Closure Compiler
+						* Преджатие zopfli
+						* Ререндер DOM как можно ближе к листьям
+						* GHCJS оптимизации `-dedupe -O2`
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Оптимизация
+
+						```
+						closure-compiler all.js \
+							--compilation_level=ADVANCED_OPTIMIZATIONS \
+							--externs=all.js.externs \
+							--externs=js/runmain.js \
+							--jscomp_off=duplicate \
+							--jscomp_off=undefinedVars \
+							--jscomp_off=externsValidation \
+							> all.min.js
+						zopfli -i1000 all.min.js
+						```
+
+						</textarea>
+					</section>
+
+				</section>
+				<section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Мобильные приложения
+
+						<img src="img/android_screen_001.jpg">
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Мобильные приложения
+
+						* CSS вкомпиливаем через Clay
+						* Все вызовы JS через API jsaddle.
+						* Линковка к Android Native SDK.
+						* C обёртки для вызова iOS Objective-C.
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Мобильные приложения
+
+						* https://github.com/NCrashed/reflex-dom-mobile
+						* https://github.com/obsidiansystems/obelisk
+
+						</textarea>
+					</section>
+
+				</section>
 			</div>
 		</div>
 
