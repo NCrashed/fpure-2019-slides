@@ -38,10 +38,20 @@
 					<textarea data-template>
 					## Проекты
 
-					* Туроператор (2015)
+					* Туроператор (2016)
 					* Keenetic Speed test system
 					* Cyberleninka Антиплагиат
 					* Собственный PoS блокчейн
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+					## План
+
+					* Испробованные альтернативы
+					* Введение в FRP в reflex-dom
+					* Архитектурные решения
+
 					</textarea>
 				</section>
 				<section data-markdown>
@@ -246,7 +256,10 @@ incE :: Event () <- button "+"
 						## Авторизация
 
 						``` Haskell
-						liftAuth :: MonadMaybeAuth m => m a -> (forall n . MonadAuthorized n => n a) -> m (Dynamic a)
+						liftAuth :: MonadMaybeAuth m
+							=> m a
+							-> (forall n . MonadAuthorized n => n a)
+							-> m (Dynamic a)
 						```
 						</textarea>
 					</section>
