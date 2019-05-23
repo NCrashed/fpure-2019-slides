@@ -125,6 +125,17 @@
 						<textarea data-template>
 						## Обзор FRP
 
+						Две ключевые библиотеки:
+						* `reflex` - FRP общего назначения
+						* `reflex-dom` - Адаптация `reflex` для разработки веб приложений.
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Обзор FRP
+
 						Ключевые понятия:
 						* Event - дискретный поток значений (push);
 						* Behavior - непрерывный поток значений (pull);
@@ -144,6 +155,7 @@
 						type Event a = [(Time, a)]
 						instance Functor Event
 						```
+						Примеры: клики кнопок, ответ сервера, срабатывание таймера
 						</textarea>
 					</section>
 
@@ -157,6 +169,7 @@
 						type Behavior a = Time -> a
 						instance Monad Behavior
 						```
+						Примеры: размер элемента, положение мышки, время
 						</textarea>
 					</section>
 
@@ -170,6 +183,7 @@
 						type Dynamic a = (Behavior a, Event a)
 						instance Monad Dynamic
 						```
+						Примеры: счётчики, значения полей ввода, кэши.
 						</textarea>
 					</section>
 
@@ -189,18 +203,18 @@
 						<textarea data-template>
 						## Counter
 
-						<iframe data-src="./demo_counter.html" style="width: 100%"></iframe>
+						<iframe data-src="./demo_counter.html"></iframe>
 
 						``` Haskell
-decE :: Event () <- button "-"
-valD :: Dynamic Int <- foldDyn ($) 0 $ leftmost [
-    (\v -> v+1) <$ incE
-  , (\v -> v-1) <$ decE
-  ]
-dynText $ do
-  val <- valD
-  pure $ "Current value: " <> showt val
-incE :: Event () <- button "+"
+						decE :: Event () <- button "-"
+						valD :: Dynamic Int <- foldDyn ($) 0 $ leftmost [
+						    (\v -> v+1) <$ incE
+						  , (\v -> v-1) <$ decE
+						  ]
+						dynText $ do
+						  val <- valD
+						  pure $ "Current value: " <> showt val
+						incE :: Event () <- button "+"
 						```
 						</textarea>
 					</section>

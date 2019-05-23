@@ -5,3 +5,6 @@
 img {
   border-width: 0 !important;
 }
+
+iframe { width: 55%; margin-left: -27%; }
+iframe { zoom: 1.5; -moz-transform: scale(1.5); -moz-transform-origin: 0 0;}
