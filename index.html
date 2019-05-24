@@ -161,6 +161,25 @@
 
 					<section data-markdown>
 						<textarea data-template>
+						## Event
+
+						``` Haskell
+						never     :: Event a
+						ffilter   :: (a -> Bool) -> Event a -> Event a
+						leftmost  :: [Event a] -> Event a
+
+						fmap      :: (a -> b) -> Event a -> Event b
+						fmapMaybe :: (a -> Maybe b) -> Event a -> Event b
+
+						ffor      :: Event a -> (a -> b) -> Event b
+						fforMaybe :: Event a -> (a -> Maybe b) -> Event b
+						```
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
 						## Behavior
 
 						![](img/behavior_plot.svg)
@@ -170,6 +189,38 @@
 						instance Monad Behavior
 						```
 						Примеры: размер элемента, положение мышки, время
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Behavior
+
+						``` Haskell
+						sample :: MonadSample m => Behavior a -> m a
+						hold   :: MonadHold   m => a -> Event a -> m (Behavior a)
+						fmap   :: (a -> b) -> Behavior a -> Behavior b
+						tag    :: Behavior a -> Event b -> Event a
+						```
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Behavior
+
+						``` Haskell
+						velocity :: Behavior Double
+						mass     :: Behavior Double
+
+						kinetic :: Behavior Double
+						kinetic = do
+							v <- velocity
+							m <- mass
+							pure $ 0.5 * m * v * v
+						```
+
 						</textarea>
 					</section>
 
@@ -189,7 +240,34 @@
 
 					<section data-markdown>
 						<textarea data-template>
-						## Switching
+						## Dynamic
+
+						``` Haskell
+						holdDyn :: MonadHold m => a -> Event a -> m (Dynamic a)
+						foldDyn :: MonadHold m => (a -> b -> b) -> b -> Event a -> m (Dynamic b)
+
+						updated :: Dynamic a -> Event a
+						current :: Dynamic a -> Behavior a
+						```
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## Event Switching
+
+						![](img/switching_event_plot.svg)
+
+						``` Haskell
+						switch :: Behavior (Event a) -> Event a
+						```
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## DOM Switching
 
 						![](img/switching_plot.svg)
 
@@ -219,7 +297,53 @@
 						</textarea>
 					</section>
 
+					<section data-markdown>
+						<textarea data-template>
+						## TODO
+
+						<iframe data-src="./demo_todo.html" style="width:500px"></iframe>
+
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+						## TODO
+
+						``` Haskell
+						strD :: Dynamic Text <- textField
+						addE :: Event Text <- tag (current strD) <$> button "Add"
+						itemsD :: Dynamic [Text] <- foldDyn ($) [] $ leftmost [
+						    (:) <$> addE
+						  , (\a -> filter (/= a)) <$> delE ]
+						delED :: Dynamic (Event Text) <-
+						  widgetHoldDyn $ ffor itemsD $ \items ->
+						    fmap leftmost . flip traverse items $ \item -> do
+						      text item
+						      e <- button "Done"
+						      pure $ item <$ e
+						let delE :: Event Text = switch . current $ delED
+						```
+						</textarea>
+					</section>
+
 				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+						## Дизайн фронта
+
+						* Монадный стек
+						* Авторизация
+						* Локализация
+						* Роутинг
+						* Оптимизации
+
+						</textarea>
+					</section>
+
+				</section>
+
 				<section>
 					<section data-markdown>
 						<textarea data-template>
